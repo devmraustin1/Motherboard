@@ -1,616 +1,940 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
+<html lang="my">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Deposit & Withdraw · 1xPopup</title>
-  <!-- Font & Icons (minimal) -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: linear-gradient(145deg, #0b1a2a 0%, #0e1f2f 100%);
-      font-family: 'Inter', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 16px;
-    }
-
-    /* Popup-style card – like a modal overlay */
-    .popup-container {
-      max-width: 1080px;
-      width: 100%;
-      background: #f5f7fc;
-      background: linear-gradient(145deg, #ffffff 0%, #f2f5fa 100%);
-      border-radius: 36px 36px 30px 30px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45), 0 4px 12px rgba(0, 0, 0, 0.3);
-      padding: 28px 28px 34px;
-      border: 1px solid rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(2px);
-      transition: all 0.2s;
-    }
-
-    /* main index style – two columns */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 28px;
-    }
-
-    @media (max-width: 780px) {
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-        gap: 32px;
-      }
-      .popup-container {
-        padding: 20px;
-        border-radius: 28px;
-      }
-    }
-
-    /* ----- both panels ----- */
-    .deposit-panel, .withdraw-panel {
-      background: white;
-      border-radius: 24px;
-      padding: 22px 20px;
-      box-shadow: 0 8px 18px rgba(0,20,40,0.08), 0 1px 3px rgba(0,0,0,0.02);
-      border: 1px solid #edf0f5;
-    }
-
-    .section-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 700;
-      font-size: 1.5rem;
-      letter-spacing: -0.02em;
-      color: #0b1f33;
-      margin-bottom: 16px;
-      border-bottom: 3px solid #ffc107;
-      padding-bottom: 12px;
-    }
-    .section-title i {
-      font-size: 1.7rem;
-    }
-
-    .withdraw-sub {
-      font-size: 0.75rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: #2f5f8a;
-      background: #e3ecf5;
-      padding: 5px 12px;
-      border-radius: 30px;
-      margin-top: 4px;
-    }
-
-    hr {
-      margin: 18px 0 16px;
-      border: 0;
-      height: 1px;
-      background: linear-gradient(to right, #dae2ed, transparent);
-    }
-
-    /* ----- deposit specific (VISA, KBZ Pay) ----- */
-    .visa-row {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      background: #f0f5fb;
-      padding: 10px 16px;
-      border-radius: 18px;
-      margin-bottom: 12px;
-    }
-    .card-badge {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .card-badge span {
-      font-weight: 600;
-      color: #1a3b5c;
-    }
-
-    .kpay-deposit-box {
-      background: #eef6ff;
-      border-radius: 20px;
-      padding: 20px 18px;
-      margin-top: 6px;
-      border: 1px solid #cde0ef;
-    }
-    .amount-large {
-      font-size: 1.7rem;
-      font-weight: 700;
-      color: #0c2e4e;
-      display: inline-block;
-      background: white;
-      padding: 4px 18px;
-      border-radius: 60px;
-      margin: 8px 0 6px;
-      border: 1px solid #bcd4e6;
-    }
-    .detail-line {
-      font-size: 0.95rem;
-      margin-bottom: 10px;
-      color: #1c3f5a;
-    }
-    .detail-line strong {
-      width: 150px;
-      display: inline-block;
-      font-weight: 600;
-    }
-
-    /* deposit form (after transfer) */
-    .confirm-form {
-      background: #fafcfe;
-      border-radius: 20px;
-      padding: 18px 16px;
-      margin: 16px 0 10px;
-      border: 1px dashed #3f8db3;
-    }
-    .form-field {
-      margin-bottom: 16px;
-    }
-    .form-field label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      font-weight: 700;
-      color: #386282;
-      display: block;
-      margin-bottom: 5px;
-    }
-    .form-field input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 1.5px solid #d7e0e8;
-      border-radius: 40px;
-      font-size: 0.9rem;
-      background: white;
-      transition: 0.2s;
-    }
-    .form-field input:focus {
-      border-color: #f5b042;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(245,176,66,0.2);
-    }
-
-    .btn-confirm {
-      background: #ffb547;
-      background: linear-gradient(145deg, #ffb042, #ffa01c);
-      border: none;
-      font-weight: 700;
-      font-size: 1.1rem;
-      padding: 14px 20px;
-      width: 100%;
-      border-radius: 60px;
-      color: #0b1e2c;
-      letter-spacing: 1px;
-      border: 1px solid #ffe9b2;
-      box-shadow: 0 6px 0 #b16200, 0 8px 16px rgba(255,160,0,0.3);
-      cursor: pointer;
-      transition: 0.07s;
-    }
-    .btn-confirm:active {
-      transform: translateY(6px);
-      box-shadow: 0 1px 0 #b16200, 0 8px 16px rgba(255,160,0,0.3);
-    }
-
-    /* payment method grids (both panels) */
-    .payment-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 12px 0 8px;
-    }
-    .payment-chip {
-      background: white;
-      border: 1px solid #cddae6;
-      padding: 8px 16px;
-      border-radius: 40px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #1e3f62;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.02);
-    }
-    .payment-chip i { font-style: normal; font-weight: 700; }
-    .payment-chip.highlight {
-      background: #112b44;
-      color: white;
-      border-color: #112b44;
-    }
-
-    .grid-categories {
-      margin-top: 12px;
-    }
-    .cat-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #4d6278;
-      margin: 16px 0 6px;
-      text-transform: uppercase;
-      letter-spacing: 0.6px;
-    }
-
-    /* ----- withdraw area: account ID, burmese note, forms ----- */
-    .account-badge {
-      background: #172f47;
-      color: white;
-      padding: 10px 16px;
-      border-radius: 28px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      display: inline-block;
-      margin-bottom: 16px;
-    }
-
-    .burmese-warning {
-      background: #fef1df;
-      border-left: 6px solid #ff9100;
-      padding: 14px 18px;
-      border-radius: 16px;
-      font-size: 0.85rem;
-      line-height: 1.5;
-      color: #2e3f53;
-      margin-bottom: 20px;
-      word-break: break-word;
-    }
-
-    .fb-link {
-      background: #1877f2;
-      color: white;
-      padding: 3px 12px;
-      border-radius: 40px;
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.75rem;
-    }
-
-    .withdraw-amount-row {
-      background: #ecf3fa;
-      padding: 12px 14px;
-      border-radius: 20px;
-      margin: 12px 0;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-    }
-
-    .kpay-input-group {
-      margin: 18px 0 8px;
-    }
-    .kpay-input-group label {
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #1c4b6e;
-      display: block;
-      margin-bottom: 4px;
-    }
-    .kpay-input-field {
-      display: flex;
-      align-items: center;
-      background: white;
-      border: 1.5px solid #cfdfee;
-      border-radius: 50px;
-      padding: 0 18px;
-    }
-    .kpay-input-field input {
-      border: none;
-      padding: 14px 0;
-      width: 100%;
-      font-size: 0.9rem;
-      background: transparent;
-    }
-    .kpay-input-field input:focus {
-      outline: none;
-    }
-    .char-counter {
-      color: #5f7d99;
-      font-size: 0.7rem;
-      margin-left: 8px;
-    }
-
-    .withdraw-confirm {
-      background: #00a36c;
-      background: linear-gradient(145deg, #00b07a, #008f5f);
-      border: none;
-      font-weight: 700;
-      font-size: 1.1rem;
-      padding: 14px 20px;
-      width: 100%;
-      border-radius: 60px;
-      color: white;
-      border: 1px solid #88dbb6;
-      box-shadow: 0 6px 0 #005f40, 0 8px 16px rgba(0,160,100,0.3);
-      margin-top: 18px;
-      letter-spacing: 1px;
-      cursor: pointer;
-      transition: 0.07s;
-    }
-    .withdraw-confirm:active {
-      transform: translateY(6px);
-      box-shadow: 0 1px 0 #005f40, 0 8px 16px rgba(0,160,100,0.2);
-    }
-
-    /* bank transfer footer */
-    .bank-footer {
-      margin-top: 24px;
-      font-size: 0.7rem;
-      font-weight: 700;
-      color: #515f6b;
-      letter-spacing: 2px;
-      border-top: 1px solid #dbe1e9;
-      padding-top: 16px;
-      text-align: center;
-    }
-    .bank-footer span {
-      background: #e2eaf1;
-      padding: 6px 18px;
-      border-radius: 40px;
-    }
-
-    /* extra button rows from deposit bottom */
-    .alt-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-    }
-    .alt-btn {
-      background: #eef3f9;
-      border: 1px solid #c8d5e2;
-      border-radius: 30px;
-      padding: 6px 16px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      color: #1a3b4e;
-    }
-
-    /* tiny spacing */
-    .mt-3 { margin-top: 16px; }
-    .mt-2 { margin-top: 12px; }
-    .text-small { font-size: 0.75rem; color: #54738f; }
-
-    /* Visa/Master icon simulation */
-    .icon-circle {
-      display: inline-block;
-      width: 28px;
-      height: 28px;
-      background: #0a3144;
-      color: white;
-      border-radius: 8px;
-      text-align: center;
-      line-height: 28px;
-      font-weight: 700;
-      font-size: 0.7rem;
-    }
-  </style>
-</head>
-<body>
-  <div class="popup-container">
-    <!-- HEADER / index hint -->
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 8px;">
-      <div style="display: flex; gap: 12px;">
-        <span style="background: #0b1f33; color: white; padding: 6px 16px; border-radius: 50px; font-weight: 600; font-size: 0.8rem;">⚡ DEPOSIT</span>
-        <span style="background: #253c54; color: white; padding: 6px 16px; border-radius: 50px; font-weight: 600; font-size: 0.8rem;">💸 WITHDRAW</span>
-      </div>
-      <div style="font-size: 0.75rem; color: #526f86;">ACCOUNT 1564802651 *</div>
-    </div>
-    
-    <!-- 2-COLUMN INDEX: DEPOSIT (left) , WITHDRAW (right) -->
-    <div class="dashboard-grid">
-      
-      <!-- ========== DEPOSIT PANEL (from 151.jpg) ========= -->
-      <div class="deposit-panel">
-        <div class="section-title">
-          <span>💳 Account deposits</span>
-        </div>
-        
-        <!-- VISA / MasterCard row -->
-        <div class="visa-row">
-          <div class="card-badge">
-            <span class="icon-circle">VISA</span>
-            <span style="font-weight: 700;">Visa</span>
-          </div>
-          <div class="card-badge">
-            <span class="icon-circle" style="background:#1f4f6e;">MC</span>
-            <span style="font-weight: 500;">MasterCard</span>
-          </div>
-        </div>
-
-        <!-- KBZ Pay block (exactly from description) -->
-        <div style="font-weight: 700; font-size: 1.3rem; color: #103246; margin: 8px 0 0 4px;">KBZ Pay</div>
-        <div class="text-small" style="margin-bottom: 8px;">If you have not made a transfer yet, you can find the payment details below:</div>
-        
-        <div class="kpay-deposit-box">
-          <div class="detail-line"><strong>Amount:</strong> <span class="amount-large">100000 MMK</span></div>
-          <div class="detail-line"><strong>Kpay Phone Number:</strong> 09882100661</div>
-          <div class="detail-line"><strong>Kpay Account Holder Name:</strong> Daw Myint Myint Aye</div>
-        </div>
-
-        <!-- Fill in the form below once the transfer is complete -->
-        <div style="font-weight: 600; color: #0f344b; margin: 12px 0 4px;">⬇️ Fill in the form below once the transfer is complete:</div>
-        <div class="confirm-form">
-          <div class="form-field">
-            <label>Kpay Account Holder Name</label>
-            <input type="text" placeholder="e.g. Daw Myint Myint Aye" value="">
-          </div>
-          <div class="form-field">
-            <label>Kpay Phone Number</label>
-            <input type="tel" placeholder="09xxxxxxxxx" value="">
-          </div>
-          <div class="form-field">
-            <label>Transaction ID (Reference No)</label>
-            <input type="text" placeholder="Enter ref number">
-          </div>
-        </div>
-        
-        <button class="btn-confirm">CONFIRM</button>
-
-        <!-- BUTTONS row: AIRTIME, AIRTM, A+Wallet, Bank Transfer, Cryptocurrency ... etc (exactly from 151.jpg) -->
-        <div style="margin-top: 22px;">
-          <div class="cat-title" style="margin-bottom: 6px;">🔽 more deposit methods</div>
-          <div class="payment-grid">
-            <span class="payment-chip">AIRTIME</span>
-            <span class="payment-chip">AIRTM</span>
-            <span class="payment-chip">A+Wallet</span>
-            <span class="payment-chip">Bank Transfer</span>
-            <span class="payment-chip">Cryptocurrency</span>
-            <span class="payment-chip">Tether on POL</span>
-            <span class="payment-chip">Tether on BSC</span>
-            <span class="payment-chip">Tether on Ethereum</span>
-            <span class="payment-chip">TRON</span>
-            <span class="payment-chip">Bitcoin</span>
-            <span class="payment-chip">Litecoin</span>
-            <span class="payment-chip">Ethereum</span>
-            <span class="payment-chip">Binance Coin BSC</span>
-            <span class="payment-chip">Dogecoin</span>
-            <span class="payment-chip">XRP</span>
-          </div>
-        </div>
-        <div class="text-small" style="margin-top: 8px; padding-left: 4px;">* supported crypto & payment</div>
-      </div>
-
-      <!-- ========== WITHDRAW PANEL (fusion of 154.jpg & 153.jpg) ========= -->
-      <div class="withdraw-panel">
-        <div class="section-title" style="border-bottom-color: #2e7d5e;">
-          <span>🏧 Withdraw funds</span>
-        </div>
-        
-        <!-- ACCOUNT number from both 154 / 153 -->
-        <div class="account-badge">WITHDRAWING FROM ACCOUNT 1564802651</div>
-        
-        <!-- Burmese warning text (carefully merged) -->
-        <div class="burmese-warning">
-          <span style="font-weight: 700;">⚠️ Confirm transactions via:</span><br>
-          အကယ်၍ သင်ငွေလက်ခံမရရှိခြင်း သို့မဟုတ် သင့်မှာ မေးခွန်းတစ်စုံတစ်ရာရှိပါက ကျေးနားပြုပြီး ကျွန်ုပ်တို့ Website or Application ရှိ Menu-Other-Customer Support-Chat ကေနတစ်ဆင့် ဆက်သွယ်ပေးပါ။ 
-          <div style="margin-top: 10px;">📘 ကျွန်ုပ်တို့ရဲ့ နောက်ဆုံး ပရိုမိုးရှင်းများကို ကြည့်ရှုရန် >> 
-          <a href="#" class="fb-link">https://facebook.com/1xbetupdatenews</a> <<</div>
-        </div>
-        
-        <!-- RECOMMENDED section + amount (Min 10k / Max 1M) from 154.jpg -->
-        <div style="display: flex; justify-content: space-between; align-items: baseline;">
-          <span style="font-weight: 700; color: #0a3142;">RECOMMENDED</span>
-          <span style="background: #d1e0eb; padding: 4px 14px; border-radius: 40px; font-size: 0.75rem;">Min 10 000.00 / Max 1 000 000.00 MMK</span>
-        </div>
-        
-        <!-- Amount row 154: 10000.00 default, with your Kpay phone/account -->
-        <div class="withdraw-amount-row">
-          <span style="font-weight:600;">Amount (MMK):</span>
-          <span style="font-size:1.5rem; font-weight:700; color:#004b6e;">10000.00</span>
-          <span style="background:#c1ddf0; padding:4px 12px; border-radius: 60px; font-size:0.7rem;">min limit</span>
-        </div>
-        
-        <!-- သင်၏ Kpay ဖုန်း နံပါတ် & account holder (from 154) -->
-        <div class="kpay-input-group">
-          <label>📱 သင်၏ Kpay ဖုန်း နံပါတ် (Your Kpay Phone Nu)</label>
-          <div class="kpay-input-field">
-            <input type="tel" placeholder="09xxxxxxxx" value="09">
-            <span class="char-counter">0/11</span>
-          </div>
-        </div>
-        <div class="kpay-input-group">
-          <label>🧾 သင်၏ Kpay အကြော့်ကြောင်းဆောင်သူနာမည် (Your Kpay Account)</label>
-          <div class="kpay-input-field">
-            <input type="text" placeholder="holder name" maxlength="30">
-            <span class="char-counter">0/30</span>
-          </div>
-          <div class="text-small" style="margin-top: 2px;">↑ 0/30 (character limit)</div>
-        </div>
-
-        <!-- CONFIRM button (withdraw) -->
-        <button class="withdraw-confirm">CONFIRM WITHDRAW</button>
-        
-        <!-- ===== PAYMENT SYSTEMS GRID ===== -->
-        <!-- Merged from 154.jpg and 153.jpg: all icons / wallets exactly -->
-        <div style="margin-top: 22px;">
-          <div class="cat-title">💠 TYPES OF PAYMENT SYSTEMS</div>
-          <!-- first row: Kpay Auto, Wave Auto, Kpay, MytelPay (154) + secondaries -->
-          <div class="payment-grid">
-            <span class="payment-chip highlight">Kpay Auto</span>
-            <span class="payment-chip highlight">Wave Auto</span>
-            <span class="payment-chip">Kpay</span>
-            <span class="payment-chip">MytelPay</span>
-            <span class="payment-chip">AYA pay wallet</span>
-            <span class="payment-chip">CBpay</span>
-            <span class="payment-chip">Uabpay</span>
-            <span class="payment-chip">A+Wallet</span>
-            <span class="payment-chip">WaveMoney</span>
-            <span class="payment-chip">Kpay New</span>
-            <span class="payment-chip">BinancePay</span>
-            <span class="payment-chip">MoneyGo USD</span>
-          </div>
-
-          <!-- Additional categories from 153: PAYMENT CARDS, E-WALLETS etc -->
-          <div class="cat-title" style="margin-top: 18px;">💳 PAYMENT CARDS</div>
-          <div class="payment-grid">
-            <span class="payment-chip">Visa</span>
-            <span class="payment-chip">MasterCard</span>
-          </div>
-
-          <div class="cat-title">📲 E-WALLETS (extended)</div>
-          <div class="payment-grid">
-            <span class="payment-chip">KPay</span>
-            <span class="payment-chip">KBZPAY</span>
-            <span class="payment-chip">Wave Auto</span>
-            <span class="payment-chip">Pay</span>
-            <span class="payment-chip">MytelPay</span>
-            <span class="payment-chip">AYA pay wallet</span>
-            <span class="payment-chip">CBpay</span>
-            <span class="payment-chip">Uabpay</span>
-            <span class="payment-chip">A+Wallet</span>
-            <span class="payment-chip">WaveMoney</span>
-            <span class="payment-chip">KPay New</span>
-            <span class="payment-chip">BinancePay</span>
-            <span class="payment-chip">MoneyGo USD</span>
-          </div>
-          
-          <!-- BANK TRANSFER footer (both files end with) -->
-          <div class="bank-footer">
-            <span>🏦  BANK TRANSFER  🏦</span>
-          </div>
-          
-          <!-- tiny extra note: Kpay phone from 154 hint -->
-          <div style="font-size: 0.65rem; color: #386075; margin-top: 12px; border-top: 1px dashed #b0c9db; padding-top: 12px;">
-            ⚡ Kpay Auto • Wave Auto • Kpay New • KBZPAY supported 
-          </div>
-        </div>
-      </div>
-    </div> <!-- end dashboard-grid -->
-
-    <!-- subtle footer to simulate popup index -->
-    <div style="display: flex; justify-content: center; gap: 18px; margin-top: 28px; color: #3d5f74; font-size: 0.7rem; border-top: 1px solid #ced9e2; padding-top: 16px;">
-      <span>🔹 Deposit methods: 20+</span>
-      <span>🔸 Withdraw: Kpay Auto, Wave, Cards, USDT</span>
-      <span>🔹 1xBet style</span>
-    </div>
-    <div style="text-align: right; color: #2a526b; font-size: 0.65rem; margin-top: 6px;">*index popup – deposit / withdraw combined</div>
-  </div> <!-- end popup-container -->
-
-  <script>
-    // simple char counter simulation (just for demo)
-    document.querySelectorAll('.kpay-input-field input').forEach(input => {
-      input.addEventListener('input', function(e) {
-        const counterSpan = this.parentElement.querySelector('.char-counter');
-        if (counterSpan) {
-          let max = this.maxLength ? this.maxLength : 30;
-          if (this.placeholder.includes('09')) max = 11;
-          let len = this.value.length;
-          counterSpan.innerText = len + '/' + max;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AIO & Mini PC Motherboard Diagnostic Master Suite</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Font Padauk for Myanmar -->
+    <link href="https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Padauk', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        pcb: '#1b4d3e',
+                        pcbDark: '#0f3127',
+                        copper: '#b87333',
+                        gold: '#d4af37',
+                    }
+                }
+            }
         }
-      });
-    });
-  </script>
+    </script>
+    <style>
+        body { font-family: 'Padauk', 'Inter', sans-serif; }
+        .tab-btn.active {
+            border-bottom: 3px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: bold;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #1f2937; }
+        ::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+        
+        .ic-pin {
+            transition: all 0.2s ease;
+        }
+        .ic-pin:hover {
+            fill: #ef4444;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center space-x-3">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-500/30 text-white">
+                    <i class="fa-solid fa-[#microchip] fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+                        AIO & Mini PC Board Diagnostic Suite
+                    </h1>
+                    <p class="text-xs text-slate-400">Chip-Level Hardware Repair & IC Pinout Master Guide (Burmese)</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center gap-2">
+                <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-xs font-semibold flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Pro Hardware Mode
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="bg-slate-900/80 border-b border-slate-800 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 flex overflow-x-auto space-x-6 text-sm font-medium">
+            <button onclick="switchTab('inspector')" id="tab-inspector" class="tab-btn active py-3 flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-microchip"></i> Interactive 2D Board & Simulator
+            </button>
+            <button onclick="switchTab('pinouts')" id="tab-pinouts" class="tab-btn py-3 flex items-center gap-2 text-slate-400 hover:text-slate-200 whitespace-nowrap">
+                <i class="fa-solid fa-list-ol"></i> Detailed IC Pinouts & Voltage Specs
+            </button>
+            <button onclick="switchTab('bplus')" id="tab-bplus" class="tab-btn py-3 flex items-center gap-2 text-slate-400 hover:text-slate-200 whitespace-nowrap">
+                <i class="fa-solid fa-bolt text-yellow-400"></i> B+ 19V Short Circuit & Components
+            </button>
+            <button onclick="switchTab('symptoms')" id="tab-symptoms" class="tab-btn py-3 flex items-center gap-2 text-slate-400 hover:text-slate-200 whitespace-nowrap">
+                <i class="fa-solid fa-stethoscope"></i> Full Symptom Repair Guides
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 space-y-6">
+
+        <!-- TAB 1: INTERACTIVE BOARD INSPECTOR & MULTIMETER SIMULATOR -->
+        <div id="section-inspector" class="space-y-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Board Visualizer (2 Cols on Large Screen) -->
+                <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-4 flex flex-col shadow-xl">
+                    <div class="flex flex-wrap items-center justify-between mb-3 gap-2">
+                        <h2 class="text-base font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-vr-cardboard text-blue-400"></i> Mini PC / AIO Interactive Motherboard Canvas
+                        </h2>
+                        <div class="flex gap-2">
+                            <button onclick="resetSimulator()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-rotate-left"></i> Reset Simulation
+                            </button>
+                            <button onclick="toggleThermalMode()" id="thermal-btn" class="px-3 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 rounded-lg text-xs transition">
+                                <i class="fa-solid fa-temperature-high"></i> Thermal Alcohol Test View
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- SVG Interactive Motherboard Canvas -->
+                    <div class="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-800 flex items-center justify-center p-2">
+                        <svg id="board-svg" viewBox="0 0 800 600" class="w-full h-full object-contain cursor-crosshair">
+                            <!-- PCB Base -->
+                            <rect x="20" y="20" width="760" height="560" rx="15" fill="#1b4d3e" stroke="#2a6654" stroke-width="4"/>
+                            
+                            <!-- PCB Ground Planes / Traces (Decoration) -->
+                            <path d="M 40,40 L 760,40 L 760,560 L 40,560 Z" fill="none" stroke="#235c4b" stroke-width="2" stroke-dasharray="10, 5"/>
+                            <path d="M 60,80 L 300,80 L 300,200 L 60,200 Z" fill="#154235" stroke="#2d735f" stroke-width="1"/>
+                            <path d="M 320,80 L 740,80 L 740,240 L 320,240 Z" fill="#154235" stroke="#2d735f" stroke-width="1"/>
+
+                            <!-- Screw Mounting Holes (GND) -->
+                            <circle cx="50" cy="50" r="14" fill="#64748b" stroke="#cbd5e1" stroke-width="3"/>
+                            <circle cx="50" cy="50" r="8" fill="#1e293b"/>
+                            
+                            <circle cx="750" cy="50" r="14" fill="#64748b" stroke="#cbd5e1" stroke-width="3"/>
+                            <circle cx="750" cy="50" r="8" fill="#1e293b"/>
+                            
+                            <circle cx="50" cy="550" r="14" fill="#64748b" stroke="#cbd5e1" stroke-width="3"/>
+                            <circle cx="50" cy="550" r="8" fill="#1e293b"/>
+
+                            <circle cx="750" cy="550" r="14" fill="#64748b" stroke="#cbd5e1" stroke-width="3"/>
+                            <circle cx="750" cy="550" r="8" fill="#1e293b"/>
+
+                            <!-- DC JACK INPUT (HOTSPOT 1) -->
+                            <g id="hs-dcjack" onclick="selectHotspot('dcjack')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="30" y="240" width="45" height="60" fill="#334155" stroke="#94a3b8" stroke-width="2" rx="3"/>
+                                <rect x="25" y="255" width="10" height="30" fill="#f59e0b"/>
+                                <text x="35" y="315" fill="#94a3b8" font-size="10" font-weight="bold">DC_JACK (19V)</text>
+                            </g>
+
+                            <!-- INPUT MOSFETS PQ1 & PQ2 (HOTSPOT 2) -->
+                            <g id="hs-mosfets" onclick="selectHotspot('mosfets')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="100" y="245" width="28" height="24" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" rx="2"/>
+                                <text x="104" y="261" fill="#e2e8f0" font-size="9" font-weight="bold">PQ1</text>
+                                
+                                <rect x="140" y="245" width="28" height="24" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5" rx="2"/>
+                                <text x="144" y="261" fill="#e2e8f0" font-size="9" font-weight="bold">PQ2</text>
+
+                                <!-- Current Sense Resistor PR1 -->
+                                <rect x="180" y="250" width="22" height="14" fill="#0284c7" stroke="#38bdf8" stroke-width="1"/>
+                                <text x="183" y="261" fill="#ffffff" font-size="8">R010</text>
+                                <text x="100" y="283" fill="#cbd5e1" font-size="10">INPUT MOSFETS (B+)</text>
+                            </g>
+
+                            <!-- B+ SMD FILTER CAPACITORS MLCC (HOTSPOT 3 - SHORT LOCATION) -->
+                            <g id="hs-caps" onclick="selectHotspot('caps')" class="hover:opacity-80 transition cursor-pointer">
+                                <!-- Cap 1 (Shorted) -->
+                                <rect id="shorted-cap" x="220" y="240" width="14" height="22" fill="#d97706" stroke="#fef08a" stroke-width="1.5"/>
+                                <rect x="220" y="240" width="14" height="4" fill="#cbd5e1"/>
+                                <rect x="220" y="258" width="14" height="4" fill="#cbd5e1"/>
+                                
+                                <!-- Cap 2 -->
+                                <rect x="240" y="240" width="14" height="22" fill="#d97706" stroke="#fef08a" stroke-width="1"/>
+                                <rect x="240" y="240" width="14" height="4" fill="#cbd5e1"/>
+                                <rect x="240" y="258" width="14" height="4" fill="#cbd5e1"/>
+
+                                <!-- Cap 3 -->
+                                <rect x="260" y="240" width="14" height="22" fill="#d97706" stroke="#fef08a" stroke-width="1"/>
+                                <rect x="260" y="240" width="14" height="4" fill="#cbd5e1"/>
+                                <rect x="260" y="258" width="14" height="4" fill="#cbd5e1"/>
+
+                                <!-- Thermal alcohol vapor overlay effect -->
+                                <circle id="thermal-evap" cx="227" cy="251" r="18" fill="rgba(239, 68, 68, 0.5)" stroke="#ef4444" stroke-width="2" class="hidden animate-ping"/>
+
+                                <text x="215" y="280" fill="#f59e0b" font-size="10" font-weight="bold">B+ Caps (PC1/PC2)</text>
+                            </g>
+
+                            <!-- CHARGING IC - BQ24780S (HOTSPOT 4) -->
+                            <g id="hs-chargingic" onclick="selectHotspot('chargingic')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="110" y="160" width="50" height="50" fill="#0f172a" stroke="#38bdf8" stroke-width="2" rx="3"/>
+                                <circle cx="118" cy="168" r="3" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                                <text x="116" y="190" fill="#38bdf8" font-size="9" font-weight="bold">BQ24780S</text>
+                                <text x="118" y="202" fill="#94a3b8" font-size="8">Charger IC</text>
+                            </g>
+
+                            <!-- 3V / 5V STANDBY PWM IC - TPS51225 (HOTSPOT 5) -->
+                            <g id="hs-standbyic" onclick="selectHotspot('standbyic')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="310" y="120" width="55" height="55" fill="#0f172a" stroke="#a855f7" stroke-width="2" rx="3"/>
+                                <circle cx="318" cy="128" r="3" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                                <text x="315" y="148" fill="#c084fc" font-size="9" font-weight="bold">TPS51225</text>
+                                <text x="313" y="160" fill="#e9d5ff" font-size="8">3V/5V Standby</text>
+                                
+                                <!-- 3V & 5V Coils -->
+                                <rect x="380" y="115" width="28" height="28" fill="#334155" stroke="#94a3b8" rx="4"/>
+                                <text x="384" y="132" fill="#38bdf8" font-size="8" font-weight="bold">PL3(3V)</text>
+
+                                <rect x="380" y="150" width="28" height="28" fill="#334155" stroke="#94a3b8" rx="4"/>
+                                <text x="384" y="167" fill="#10b981" font-size="8" font-weight="bold">PL5(5V)</text>
+                            </g>
+
+                            <!-- SUPER I/O / EC IC - IT8587 (HOTSPOT 6) -->
+                            <g id="hs-ecic" onclick="selectHotspot('ecic')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="100" y="380" width="80" height="80" fill="#0f172a" stroke="#10b981" stroke-width="2" rx="4"/>
+                                <circle cx="110" cy="390" r="4" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                                <text x="115" y="420" fill="#34d399" font-size="12" font-weight="bold">IT8587E</text>
+                                <text x="120" y="435" fill="#a7f3d0" font-size="9">EC / Super I/O</text>
+                            </g>
+
+                            <!-- BIOS SPI FLASH IC - 8-PIN (HOTSPOT 7) -->
+                            <g id="hs-biosic" onclick="selectHotspot('biosic')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="210" y="400" width="35" height="45" fill="#0f172a" stroke="#eab308" stroke-width="2" rx="2"/>
+                                <circle cx="216" cy="408" r="3" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                                <!-- 8 Pins -->
+                                <rect x="204" y="406" width="6" height="4" fill="#cbd5e1"/>
+                                <rect x="204" y="416" width="6" height="4" fill="#cbd5e1"/>
+                                <rect x="204" y="426" width="6" height="4" fill="#cbd5e1"/>
+                                <rect x="204" y="436" width="6" height="4" fill="#cbd5e1"/>
+
+                                <rect x="245" y="406" width="6" height="4" fill="#cbd5e1"/>
+                                <rect x="245" y="416" width="6" height="4" fill="#cbd5e1"/>
+                                <rect x="245" y="426" width="6" height="4" fill="#cbd5e1"/>
+                                <rect x="245" y="436" width="6" height="4" fill="#cbd5e1"/>
+
+                                <text x="214" y="426" fill="#fde047" font-size="8" font-weight="bold">BIOS</text>
+                            </g>
+
+                            <!-- CPU SOC / PCH & VCORE DRMOS (HOTSPOT 8) -->
+                            <g id="hs-cpu" onclick="selectHotspot('cpu')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="480" y="280" width="160" height="160" fill="#1e293b" stroke="#f43f5e" stroke-width="3" rx="8"/>
+                                <rect x="520" y="320" width="80" height="80" fill="#0284c7" stroke="#38bdf8" stroke-width="1.5"/>
+                                <text x="532" y="365" fill="#ffffff" font-size="14" font-weight="bold">CPU SOC</text>
+
+                                <!-- DrMOS & VCore Coils -->
+                                <rect x="430" y="290" width="30" height="25" fill="#0f172a" stroke="#f43f5e" rx="2"/>
+                                <text x="432" y="306" fill="#fda4af" font-size="7">DrMOS 1</text>
+                                <rect x="430" y="325" width="30" height="30" fill="#334155" stroke="#94a3b8" rx="3"/>
+                                <text x="434" y="343" fill="#cbd5e1" font-size="8">VCORE</text>
+
+                                <rect x="430" y="365" width="30" height="25" fill="#0f172a" stroke="#f43f5e" rx="2"/>
+                                <text x="432" y="381" fill="#fda4af" font-size="7">DrMOS 2</text>
+                                <rect x="430" y="400" width="30" height="30" fill="#334155" stroke="#94a3b8" rx="3"/>
+                                <text x="434" y="418" fill="#cbd5e1" font-size="8">VCORE</text>
+                            </g>
+
+                            <!-- DDR4 RAM SLOT (HOTSPOT 9) -->
+                            <g id="hs-ram" onclick="selectHotspot('ram')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="450" y="100" width="260" height="35" fill="#0f172a" stroke="#06b6d4" stroke-width="2" rx="3"/>
+                                <rect x="575" y="100" width="10" height="35" fill="#1e293b"/> <!-- RAM Notch -->
+                                <text x="520" y="122" fill="#67e8f9" font-size="11" font-weight="bold">DDR4 SODIMM SLOT (1.2V / SPD 3.3V)</text>
+                            </g>
+
+                            <!-- FAN HEADER (HOTSPOT 10) -->
+                            <g id="hs-fan" onclick="selectHotspot('fan')" class="hover:opacity-80 transition cursor-pointer">
+                                <rect x="700" y="200" width="40" height="20" fill="#cbd5e1" stroke="#475569" stroke-width="1.5"/>
+                                <text x="705" y="214" fill="#0f172a" font-size="8" font-weight="bold">FAN_1</text>
+                            </g>
+                        </svg>
+                    </div>
+
+                    <div class="mt-3 text-xs text-slate-400 flex items-center justify-between">
+                        <span><i class="fa-solid fa-hand-pointer text-blue-400"></i> Motherboard ပေါ်ရှိ Component တစ်ခုချင်းစီအား နှိပ်၍ Measurement Test နှင့် Repair Procedure ကို စစ်ဆေးပါ</span>
+                        <span id="active-component-label" class="text-blue-400 font-bold">Selected: B+ SMD Capacitors</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Multimeter & Test Lab Controller -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col justify-between shadow-xl space-y-4">
+                    <div>
+                        <h2 class="text-base font-bold text-slate-200 border-b border-slate-800 pb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-gauge-high text-emerald-400"></i> Multimeter & Diagnostic Workbench
+                        </h2>
+
+                        <!-- Multimeter Mode Selector -->
+                        <div class="mt-4 space-y-2">
+                            <label class="text-xs text-slate-400 font-semibold">MULTIMETER MODE SELECTOR:</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button onclick="setMeterMode('diode')" id="mode-diode" class="px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-bell"></i> Diode / Ω
+                                </button>
+                                <button onclick="setMeterMode('dc')" id="mode-dc" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-bolt"></i> DC Voltage
+                                </button>
+                                <button onclick="setMeterMode('inject')" id="mode-inject" class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold flex items-center justify-center gap-1">
+                                    <i class="fa-solid fa-syringe text-red-400"></i> Inject 1.2V
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Multimeter Digital Screen Display -->
+                        <div class="mt-4 bg-black/90 border-2 border-emerald-500/50 rounded-xl p-4 font-mono flex flex-col items-center justify-center shadow-inner">
+                            <span class="text-[10px] text-emerald-600 uppercase tracking-widest" id="meter-mode-text">DIODE / CONTINUITY TEST MODE</span>
+                            <div class="text-3xl md:text-4xl font-extrabold text-emerald-400 tracking-wider my-1" id="meter-display-val">
+                                0.000 Ω
+                            </div>
+                            <span class="text-xs text-red-500 font-bold animate-pulse hidden" id="short-warning">
+                                <i class="fa-solid fa-triangle-exclamation"></i> DIRECT SHORT TO GROUND DETECTED!
+                            </span>
+                        </div>
+
+                        <!-- Test Analysis Details (Burmese) -->
+                        <div class="mt-4 bg-slate-950 border border-slate-800 rounded-xl p-3 space-y-2 text-xs">
+                            <h4 class="font-bold text-blue-400 flex items-center gap-1.5" id="inspector-title">
+                                Selected Component Diagnostic
+                            </h4>
+                            <p class="text-slate-300 leading-relaxed" id="inspector-desc">
+                                B+ 19V Main Rail Ceramic Capacitor (PC1/PC2) စစ်ဆေးခြင်း
+                            </p>
+                            <div class="border-t border-slate-800 pt-2 space-y-1">
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Probe Point (ထောက်ရမည့်နေရာ):</span>
+                                    <span class="text-slate-200 font-medium" id="probe-point">Positive Pad to GND</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Normal Reading (ပုံမှန်တန်ဖိုး):</span>
+                                    <span class="text-emerald-400 font-medium" id="normal-val">0.350V ~ 0.500V / 19.0V DC</span>
+                                </div>
+                                <div class="flex justify-between text-slate-400">
+                                    <span>Fault Reading (အပြစ်တန်ဖိုး):</span>
+                                    <span class="text-red-400 font-medium" id="fault-val">0.000 Ω (Beep / Direct Short)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommended Action Box -->
+                    <div class="bg-amber-950/40 border border-amber-500/30 rounded-xl p-3 text-xs space-y-1.5">
+                        <h5 class="font-bold text-amber-400 flex items-center gap-1">
+                            <i class="fa-solid fa-wrench"></i> Pro Technician Action Rule:
+                        </h5>
+                        <p class="text-slate-300 leading-relaxed" id="action-rule">
+                            Short ကျနေသော Capacitors များအား အသစ်ပြန်အစားထိုးရန် မလိုအပ်ပါ။ ခွာထုတ်လိုက်ပါက B+ Short ချက်ချင်း ပျောက်ကွယ်သွားပြီး ပါဝါပြန်လာပါမည်။
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: DETAILED IC PINOUTS & VOLTAGE SPECS -->
+        <div id="section-pinouts" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl space-y-4">
+                <div class="flex flex-wrap items-center justify-between border-b border-slate-800 pb-3 gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <i class="fa-solid fa-microchip text-blue-400"></i> Chip-Level IC Pinout Specs & Testing Guide
+                        </h2>
+                        <p class="text-xs text-slate-400">IC Pin တိုင်းတာနည်း၊ Pin 1 စတင်ရေတွက်ပုံ နှင့် Standard Operating Voltages များ</p>
+                    </div>
+                    <div class="bg-slate-800 p-1.5 rounded-lg text-xs flex gap-1">
+                        <button onclick="showIC('charger')" id="btn-ic-charger" class="px-3 py-1.5 bg-blue-600 text-white font-bold rounded-md">BQ24780S (Charger)</button>
+                        <button onclick="showIC('standby')" id="btn-ic-standby" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md">TPS51225 (3V/5V)</button>
+                        <button onclick="showIC('ec')" id="btn-ic-ec" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md">IT8587 (Super I/O)</button>
+                        <button onclick="showIC('bios')" id="btn-ic-bios" class="px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md">BIOS SOP8</button>
+                    </div>
+                </div>
+
+                <!-- Dynamic IC Display Panel -->
+                <div id="ic-display-content" class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <!-- Dynamic JS Content Injected Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: B+ 19V SHORT CIRCUIT & COMPONENT NECESSITY -->
+        <div id="section-bplus" class="hidden space-y-6">
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl space-y-6">
+                <div>
+                    <h2 class="text-xl font-bold text-amber-400 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Adapter Trip & B+ 19V Main Rail Short Circuit Master Troubleshooting
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-1">
+                        Adapter ထိုးလိုက်သည်နှင့် Adapter LED ငြိမ်းသွားခြင်း သို့မဟုတ် Voltage 0V ပြုတ်ကျသွားသည့် အပြစ်များအား Chip-Level စစ်ဆေးနည်း
+                    </p>
+                </div>
+
+                <!-- Component Replacement Decision Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse border border-slate-800">
+                        <thead>
+                            <tr class="bg-slate-800/80 text-slate-200">
+                                <th class="p-3 border border-slate-700">Component အမျိုးအစား</th>
+                                <th class="p-3 border border-slate-700">Board Symbol</th>
+                                <th class="p-3 border border-slate-700">ပါဝါပြန်လာရန် အစားထိုးရန် လို/မလို?</th>
+                                <th class="p-3 border border-slate-700">Technical Logic & Repair Rules</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 text-slate-300">
+                            <tr class="hover:bg-slate-800/30">
+                                <td class="p-3 border border-slate-800 font-bold text-amber-400">
+                                    Yellow/Brown Ceramic Capacitors (MLCC)
+                                </td>
+                                <td class="p-3 border border-slate-800 font-mono text-slate-400">PC / C</td>
+                                <td class="p-3 border border-slate-800">
+                                    <span class="px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded font-bold">မလိုပါ (ဖြုတ်ထားပါ)</span>
+                                </td>
+                                <td class="p-3 border border-slate-800 leading-relaxed">
+                                    B+ 19V Rail တွင် Parallel (ပြိုင်ဆက်) ဆက်ထားသဖြင့် **Short ဖြစ်နေသော အတုံးကို ခွာထုတ်လိုက်ရုံဖြင့် 19V Short ချက်ချင်း ပျောက်ပြီး ပါဝါပြန်လာပါသည်**။ အစားထိုးရန် မလိုအပ်ပါ။
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/30">
+                                <td class="p-3 border border-slate-800 font-bold text-blue-400">
+                                    Input MOSFETs (First & Second Gate)
+                                </td>
+                                <td class="p-3 border border-slate-800 font-mono text-slate-400">PQ1, PQ2</td>
+                                <td class="p-3 border border-slate-800">
+                                    <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded font-bold">အစားထိုးရန် လိုအပ်သည်</span>
+                                </td>
+                                <td class="p-3 border border-slate-800 leading-relaxed">
+                                    Drain-to-Source Short သို့မဟုတ် Gate ပေါက်နေပါက 19V လမ်းကြောင်း ပွင့်မည်မဟုတ်ပါ။ Specification တူညီသော N-Channel 30V MOSFET အသစ် အစားထိုးရပါမည်။
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/30">
+                                <td class="p-3 border border-slate-800 font-bold text-purple-400">
+                                    PWM / Charging Control IC
+                                </td>
+                                <td class="p-3 border border-slate-800 font-mono text-slate-400">U / PU</td>
+                                <td class="p-3 border border-slate-800">
+                                    <span class="px-2 py-1 bg-red-500/20 text-red-400 rounded font-bold">အစားထိုးရန် လိုအပ်သည်</span>
+                                </td>
+                                <td class="p-3 border border-slate-800 leading-relaxed">
+                                    IC ၏ VCC သို့မဟုတ် ACDET Pin Internal Short ဖြစ်ပါက အစားထိုးရပါမည်။ Part Number တူညီသော IC သို့မဟုတ် Board အဟောင်းမှ လဲလှယ်ရပါမည်။
+                                </td>
+                            </tr>
+                            <tr class="hover:bg-slate-800/30">
+                                <td class="p-3 border border-slate-800 font-bold text-slate-300">
+                                    Power Inductors / Coils
+                                </td>
+                                <td class="p-3 border border-slate-800 font-mono text-slate-400">PL</td>
+                                <td class="p-3 border border-slate-800">
+                                    <span class="px-2 py-1 bg-slate-700 text-slate-300 rounded font-bold">လဲရန် မလိုပါ</span>
+                                </td>
+                                <td class="p-3 border border-slate-800 leading-relaxed">
+                                    Coil များသည် Short ဖြစ်ခဲပါသည်။ Short Line မည်သည့်အကန့်တွင် ရှိသည်ကို Circuit အကန့်ခွဲ စစ်ဆေးရန်အတွက်သာ Coil ကို ဖြုတ်၍ တိုင်းတာသည်။
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pro Step-by-Step Short Injection Guide -->
+                <div class="bg-slate-950 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <h3 class="text-sm font-bold text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-vial"></i> DC Bench Power Supply Voltage Injection Technique (Short ရှာနည်း)
+                    </h3>
+                    <ol class="list-decimal list-inside text-xs text-slate-300 space-y-2 leading-relaxed">
+                        <li><strong class="text-amber-400">Voltage တန်ဖိုး သတ်မှတ်ခြင်း:</strong> Power Supply Voltage ကို **1.0V မှ 1.5V ထက် ပိုမပေးရပါ** (Ampere ကို 3A မှ 5A ထားပါ)။ Voltage လွန်ပါက CPU/PCH ပျက်စီးနိုင်သည်။</li>
+                        <li><strong class="text-amber-400">Voltage ထည့်သွင်းခြင်း:</strong> Power Supply ၏ Red (+ Probe) ကို B+ Rail (PQ2 Drain သို့မဟုတ် Short ကျနေသော Capacitor Plus Pad) တွင် သဟဇာတဖြစ်အောင် ဂဟေဆက်ပါ၊ Black (- Probe) ကို Board GND တွင် ချိတ်ပါ။</li>
+                        <li><strong class="text-amber-400">Alcohol Test / Thermal Inspection:</strong> Board ပေါ်ရှိ SMD Ceramic Capacitors များပေါ်သို့ **Isopropyl Alcohol (IPA)** ဖြန်းပေးပါ။ Short ကျနေသော အတုံးသည် ချက်ချင်း ပူလာပြီး Alcohol အငွေ့ပျံသွားပါမည်။</li>
+                        <li><strong class="text-amber-400">ပြုပြင်ခြင်း:</strong> ထိုပူလာသော Capacitor အတုံးကို Hot Air Station ဖြင့် ခွာထုတ်လိုက်ပါ၊ B+ Short ချက်ချင်း ပျောက်သွားပါမည်။</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: FULL SYMPTOM REPAIR GUIDES -->
+        <div id="section-symptoms" class="hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Symptom Card 1 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-red-400 font-bold text-sm border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-power-off"></i> 1. No Power (ပါဝါ လုံးဝမလာခြင်း)
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                        <li>DC Jack အဝင် 19V တိုင်းပါ ( Adapter အဆင်ပြေရမည်)။</li>
+                        <li>PQ1, PQ2 Input MOSFET Gate Voltage (24V ACDRV) ထွက်မထွက် စစ်ပါ။</li>
+                        <li>3V/5V Standby PWM IC ၏ VREG3 (3.3V) & VREG5 (5V) LDO စစ်ပါ။</li>
+                        <li>EC IC (IT8587) VCC 3.3V နှင့် Power Button 3.3V -> 0V Pulse စစ်ပါ။</li>
+                    </ul>
+                </div>
+
+                <!-- Symptom Card 2 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-amber-400 font-bold text-sm border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-memory"></i> 2. RAM Detection Failure (3 Beeps / No Display)
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                        <li>DDR4 Main VDD Voltage **1.2V** Coil တွင် ထွက်မထွက် စစ်ပါ။</li>
+                        <li>DDR4 VTT Bus Termination Voltage **0.6V** စစ်ပါ။</li>
+                        <li>SPD Pin 255/256 တွင် SMBus Clock & Data **3.3V** တိုင်းပါ။</li>
+                        <li>RAM Slot Pin များ ဖုန်တက်/ဂျီးကပ်နေပါက Contact Cleaner ဖြင့် ဆေးပါ။</li>
+                    </ul>
+                </div>
+
+                <!-- Symptom Card 3 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-blue-400 font-bold text-sm border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-desktop"></i> 3. No Display / Black Screen (စက်ပွင့်ပြီး ရုပ်မလာ)
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                        <li>CPU VCORE Coil တွင် **0.8V - 1.0V** ထွက်မထွက် စစ်ပါ။</li>
+                        <li>BIOS Chip Pin 8 VCC **3.3V** နှင့် Pin 1 CS# Signals တိုင်းပါ။</li>
+                        <li>BIOS Firmware Bin File ပျက်စီးပါက BIOS Programmer ဖြင့် Flash ပြန်လုပ်ပါ။</li>
+                        <li>PCH PLTRST# Reset Signal **3.3V** ရှိမရှိ စစ်ပါ။</li>
+                    </ul>
+                </div>
+
+                <!-- Symptom Card 4 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-purple-400 font-bold text-sm border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-fan"></i> 4. Continuous High-Speed Fan Spin
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                        <li>CPU Thermal NTC Sensor Resistor line တွင် Voltage မှားနေခြင်း။</li>
+                        <li>Fan PWM Control Circuit (MOSFET/Transistor) Short ဖြစ်နေခြင်း။</li>
+                        <li>EC Super I/O IC Firmware ပျက်နေသဖြင့် Fan Control Signal အမြဲ Max ပေးနေခြင်း။</li>
+                    </ul>
+                </div>
+
+                <!-- Symptom Card 5 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-emerald-400 font-bold text-sm border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-plug-circle-bolt"></i> 5. Auto Power-On when Plugged In
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                        <li>RTC 3V Battery Voltage **2.8V အောက်** နည်းနေပါက Auto-On ဖြစ်တတ်ပါသည်။</li>
+                        <li>Deep S5 State Switch MOSFET ပေါက်နေခြင်း။</li>
+                        <li>BIOS RTC Clear CMOS Settings ပျက်နေခြင်း။</li>
+                    </ul>
+                </div>
+
+                <!-- Symptom Card 6 -->
+                <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
+                    <div class="flex items-center gap-2 text-cyan-400 font-bold text-sm border-b border-slate-800 pb-2">
+                        <i class="fa-solid fa-spinner"></i> 6. Boot Failure / Stuck at Logo
+                    </div>
+                    <ul class="text-xs text-slate-300 space-y-1.5 list-disc list-inside">
+                        <li>NVMe / SATA +3.3V & +5V Power Rail Voltage ပြုတ်ကျနေခြင်း။</li>
+                        <li>PCH PCIe Clock Generator Signal မငြိမ်ခြင်း။</li>
+                        <li>Storage Controller / PCH Chip အပူလွန်ကဲနေခြင်း။</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 border-t border-slate-800 mt-auto py-4 text-center text-xs text-slate-500">
+        AIO & Mini PC Motherboard Diagnostic Suite &bull; Hardware Chip-Level Repair Burmese Documentation
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // Global Application State
+        const state = {
+            activeHotspot: 'caps',
+            meterMode: 'diode', // 'diode', 'dc', 'inject'
+            thermalView: false,
+            selectedIC: 'charger'
+        };
+
+        // Hotspot Diagnostic Data Source
+        const hotspotData = {
+            dcjack: {
+                title: 'DC Jack Power Input (19V)',
+                desc: 'Adapter မှ 19V Main DC Power စတင်ဝင်ရောက်သည့် နေရာ ဖြစ်သည်။',
+                probe: 'DC Jack Positive Pin to GND',
+                normalVal: '19.0V - 20.0V DC',
+                faultVal: '0V DC / High Resistance Short',
+                action: 'Adapter ထိုးလိုက်သည်နှင့် 0V လျှော့ကျသွားပါက B+ Rail Short ကျနေခြင်းဖြစ်သည်။',
+                meterDiode: '0.450 V',
+                meterDC: '19.50 V',
+                meterInject: '1.200 V (0.05A)'
+            },
+            mosfets: {
+                title: 'Input MOSFETs (PQ1 / PQ2 N-Channel)',
+                desc: '19V Power Rail အား ဘုတ်အတွင်းသို့ ဖြတ်သန်းခွင့်ပေးသည့် အဓိက Power Switching MOSFET များ။',
+                probe: 'PQ1 Drain (Pins 5-8) to Source (Pins 1-3)',
+                normalVal: 'Gate 24V (AcDrv Triggered)',
+                faultVal: 'Drain-to-Source 0.000 Ω Short',
+                action: 'MOSFET ပေါက်နေပါက Specification တူညီသော N-Channel 30V MOSFET ပြန်လည်အစားထိုးရမည်။',
+                meterDiode: '0.520 V',
+                meterDC: '19.50 V',
+                meterInject: '1.200 V (0.12A)'
+            },
+            caps: {
+                title: 'B+ Main Rail SMD Ceramic Capacitors (PC1/PC2)',
+                desc: 'အဝါရောင်/အညိုရောင် MLCC Capacitors များဖြစ်ပြီး B+ 19V Short ဖြစ်ရခြင်း၏ ၈၀% အဓိက တရားခံ ဖြစ်သည်။',
+                probe: 'Capacitor Positive Pad to GND',
+                normalVal: '0.350V - 0.500V Diode Mode',
+                faultVal: '0.000 Ω (Beep / Direct Short)',
+                action: 'Short ကျနေသော Capacitor ကို ခွာထုတ်လိုက်ရုံဖြင့် B+ Short ချက်ချင်း ပျောက်ပြီး ပါဝါပြန်လာမည်။ အသစ်အစားထိုးရန် မလိုပါ။',
+                meterDiode: '0.000 Ω (BEEP)',
+                meterDC: '0.00 V (Dropped)',
+                meterInject: '1.200 V (3.85A HOT)'
+            },
+            chargingic: {
+                title: 'PWM Charging IC (BQ24780S / BQ24725A)',
+                desc: 'Adapter Detect ပြုလုပ်ပြီး Input MOSFET Gate (24V) အား မောင်းနှင်ပေးသော IC။',
+                probe: 'Pin 28 (VCC) & Pin 6 (ACDET)',
+                normalVal: 'VCC: 19V, ACDET: 2.6V, ACDRV: 24V',
+                faultVal: 'ACDET < 2.4V or REGN 0V',
+                action: 'IC Short ဖြစ်နေပါက Part Number တူညီသော IC အသစ် အစားထိုးရပါမည်။',
+                meterDiode: '0.480 V',
+                meterDC: '19.50 V',
+                meterInject: '1.200 V (0.08A)'
+            },
+            standbyic: {
+                title: '3V / 5V Standby PWM IC (TPS51225)',
+                desc: 'စက်မနိုးမီ Board တွင် အဓိက လိုအပ်သော 3.3V နှင့် 5V Standby Voltage များ ထုတ်ပေးသည့် IC။',
+                probe: 'Pin 3 (VREG3), Pin 13 (VREG5), PL3/PL5 Coils',
+                normalVal: 'PL3: 3.3V DC, PL5: 5.0V DC',
+                faultVal: 'LDO 0V / Coil Short to GND',
+                action: '3V/5V LDO သို့မဟုတ် Coils တွင် Short မရှိပါက IC ကို အသစ်လဲပေးပါ၊',
+                meterDiode: '0.380 V',
+                meterDC: '3.30 V',
+                meterInject: '1.200 V (0.04A)'
+            },
+            ecic: {
+                title: 'Super I/O / EC IC (IT8587 / IT8987)',
+                desc: 'Power On Logic, Keyboard, Fan Control နှင့် System Signals များကို ထိန်းချုပ်သော 128-Pin IC။',
+                probe: 'VCC 3.3V Pins & Power Button Pin',
+                normalVal: 'VCC 3.3V, PWRON 3.3V -> 0V',
+                faultVal: 'VCC Pin Short / No Power Pulse',
+                action: 'EC IC ပူနေပါက သို့မဟုတ် Firmware ပျက်ပါက IC အသစ်လဲ၍ Firmware Flash ပြန်လုပ်ပါ။',
+                meterDiode: '0.420 V',
+                meterDC: '3.30 V',
+                meterInject: '1.200 V (0.02A)'
+            },
+            biosic: {
+                title: 'BIOS SPI Flash IC (8-Pin SOP8)',
+                desc: 'Motherboard System Firmware / Hardware Initialization Data သိမ်းဆည်းထားသော IC။',
+                probe: 'Pin 8 (VCC 3.3V) & Pin 1 (CS#)',
+                normalVal: 'Pin 8: 3.3V Standby',
+                faultVal: 'Pin 8 Voltage 0V / CS# Signal No Wave',
+                action: 'BIOS Data ပျက်စီးပါက External RT809F/CH341A Programmer ဖြင့် Clean ME BIOS Flash ရေးပါ။',
+                meterDiode: '0.510 V',
+                meterDC: '3.30 V',
+                meterInject: '1.200 V (0.01A)'
+            },
+            cpu: {
+                title: 'CPU SOC & DrMOS VCORE Power Phase',
+                desc: 'CPU သို့ 0.8V - 1.2V High Current VCORE Supply ပေးသွင်းသည့် Multi-Phase DrMOS Circuit။',
+                probe: 'VCORE Coils to Ground',
+                normalVal: '0.015V - 0.050V (Low Resistance is Normal!)',
+                faultVal: '0.000 Ω Direct Short to 19V Rail',
+                action: 'DrMOS High-Side MOSFET ပေါက်ပါက CPU သို့ 19V တိုက်ရိုက်ရောက်ပြီး CPU ပျက်စီးနိုင်သည်။ DrMOS လဲပါ။',
+                meterDiode: '0.025 V',
+                meterDC: '0.95 V',
+                meterInject: '1.000 V (1.50A)'
+            },
+            ram: {
+                title: 'DDR4 SODIMM RAM Slot Rail',
+                desc: 'DDR4 Memory Slot အတွက် 1.2V VDD Power နှင့် 3.3V SPD Power Supply လိုင်းများ။',
+                probe: 'RAM Slot Power Capacitors',
+                normalVal: 'VDD: 1.2V, SPD: 3.3V, VTT: 0.6V',
+                faultVal: 'VDD 0V / Short to GND',
+                action: 'RAM Power PWM Buck Converter IC & MOSFET များ စစ်ဆေးပါ။',
+                meterDiode: '0.410 V',
+                meterDC: '1.20 V',
+                meterInject: '1.200 V (0.10A)'
+            },
+            fan: {
+                title: 'CPU Cooling Fan Header & Thermal NTC',
+                desc: 'Fan 12V/5V Power, PWM Speed Control, Tachometer Pulse Signal နေရာ။',
+                probe: 'Pin 1 (+12V/5V), Pin 4 (PWM)',
+                normalVal: 'Pin 1: 5V/12V, PWM: 1.5V-3.0V',
+                faultVal: 'PWM Pin Short to GND',
+                action: 'Fan အလွန်အမင်း အမြဲလှည့်နေပါက Thermal Resistor NTC နှင့် PWM Control Transistor စစ်ပါ။',
+                meterDiode: '0.550 V',
+                meterDC: '5.00 V',
+                meterInject: '1.200 V (0.05A)'
+            }
+        };
+
+        // IC Detailed Specifications Source
+        const icData = {
+            charger: {
+                name: 'BQ24780S / BQ24725A PWM Charger IC',
+                package: 'QFN-28 (Pin 1 Dot top-left corner)',
+                pinoutSvg: `
+                    <svg viewBox="0 0 300 220" class="w-full h-auto bg-slate-950 rounded-xl border border-slate-800 p-2">
+                        <!-- IC Body -->
+                        <rect x="70" y="30" width="160" height="160" fill="#0f172a" stroke="#38bdf8" stroke-width="2" rx="4"/>
+                        <circle cx="85" cy="45" r="5" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                        <text x="110" y="115" fill="#38bdf8" font-size="14" font-weight="bold">BQ24780S</text>
+                        
+                        <!-- Top Pins (22-28) -->
+                        <g fill="#cbd5e1" font-size="7">
+                            <rect x="85" y="18" width="10" height="12"/><text x="87" y="15" fill="#a7f3d0">28</text>
+                            <rect x="110" y="18" width="10" height="12"/><text x="112" y="15" fill="#94a3b8">27</text>
+                            <rect x="135" y="18" width="10" height="12"/><text x="137" y="15" fill="#94a3b8">26</text>
+                            <rect x="160" y="18" width="10" height="12"/><text x="162" y="15" fill="#94a3b8">25</text>
+                            <rect x="185" y="18" width="10" height="12"/><text x="187" y="15" fill="#94a3b8">24</text>
+                        </g>
+
+                        <!-- Left Pins (1-7) -->
+                        <g fill="#cbd5e1" font-size="7">
+                            <rect x="58" y="40" width="12" height="10"/><text x="35" y="48" fill="#fef08a">1: ACN</text>
+                            <rect x="58" y="65" width="12" height="10"/><text x="35" y="73" fill="#fef08a">2: ACP</text>
+
+                            <rect x="58" y="90" width="12" height="10"/><text x="25" y="98" fill="#f43f5e">4: ACDRV</text>
+                            <rect x="58" y="115" width="12" height="10"/><text x="25" y="123" fill="#38bdf8">6: ACDET</text>
+
+                            <rect x="58" y="140" width="12" height="10"/><text x="25" y="148" fill="#a855f7">28: VCC</text>
+                        </g>
+                    </svg>
+                `,
+                keyPins: [
+                    { pin: 'Pin 28 (VCC)', voltage: '19.0V - 19.5V DC', desc: 'Main Adapter Power Supply Input (Diode အလွန်မှ ဝင်သည်)' },
+                    { pin: 'Pin 6 (ACDET)', voltage: '2.4V - 2.8V DC', desc: 'Adapter Voltage Divider Resistor မှ Detect လုပ်သော Pin (19V မှ 2.6V ဆင်းပေးရမည်)' },
+                    { pin: 'Pin 4 (ACDRV)', voltage: '24.0V DC (High)', desc: 'Input MOSFET PQ1/PQ2 Gate မောင်းရန် Charge Pump ဖြင့် 19V + 6V = 24V ထုတ်ပေးသည်' },
+                    { pin: 'Pin 24 (REGN)', voltage: '6.0V DC (LDO)', desc: 'Charger IC ၏ Internal Linear LDO Voltage' },
+                    { pin: 'Pin 5 (ACOK)', voltage: '3.3V DC (High)', desc: 'Adapter OK Signal ကို EC IC သို့ ပို့ပေးသည်' }
+                ]
+            },
+            standby: {
+                name: 'TPS51225 Dual Synchronous Buck Controller (3V/5V)',
+                package: 'QFN-20 (Pin 1 Dot top-left corner)',
+                pinoutSvg: `
+                    <svg viewBox="0 0 300 220" class="w-full h-auto bg-slate-950 rounded-xl border border-slate-800 p-2">
+                        <rect x="80" y="30" width="140" height="160" fill="#0f172a" stroke="#a855f7" stroke-width="2" rx="4"/>
+                        <circle cx="95" cy="45" r="5" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                        <text x="110" y="115" fill="#c084fc" font-size="14" font-weight="bold">TPS51225</text>
+                        
+                        <g fill="#cbd5e1" font-size="7">
+                            <rect x="68" y="40" width="12" height="10"/><text x="25" y="48" fill="#f43f5e">Pin 3: VREG3</text>
+                            <rect x="68" y="70" width="12" height="10"/><text x="25" y="78" fill="#38bdf8">Pin 12: VIN</text>
+                            <rect x="68" y="100" width="12" height="10"/><text x="25" y="108" fill="#10b981">Pin 13: VREG5</text>
+                            <rect x="68" y="130" width="12" height="10"/><text x="25" y="eab308">Pin 20: EN1</text>
+                        </g>
+                    </svg>
+                `,
+                keyPins: [
+                    { pin: 'Pin 12 (VIN)', voltage: '19.0V DC', desc: 'Main B+ 19V Supply Input' },
+                    { pin: 'Pin 3 (VREG3)', voltage: '3.3V DC (LDO)', desc: 'Always-On LDO Output for Super I/O & Power Button' },
+                    { pin: 'Pin 13 (VREG5)', voltage: '5.0V DC (LDO)', desc: 'Always-On LDO Output for PWM Gate Drivers' },
+                    { pin: 'Pin 20 / 6 (EN1 / EN2)', voltage: '3.3V DC', desc: 'Enable Switches for 3.3V & 5V Buck Switching Regulators' }
+                ]
+            },
+            ec: {
+                name: 'IT8587E / IT8987E Super I/O / EC IC',
+                package: 'LQFP-128 (Pin 1 Dot at Bottom-Left Corner)',
+                pinoutSvg: `
+                    <svg viewBox="0 0 300 220" class="w-full h-auto bg-slate-950 rounded-xl border border-slate-800 p-2">
+                        <rect x="70" y="30" width="160" height="160" fill="#0f172a" stroke="#10b981" stroke-width="2" rx="4"/>
+                        <circle cx="82" cy="178" r="5" fill="#ef4444"/> <!-- Pin 1 Dot Bottom Left for LQFP -->
+                        <text x="115" y="115" fill="#34d399" font-size="14" font-weight="bold">IT8587E</text>
+                    </svg>
+                `,
+                keyPins: [
+                    { pin: 'VCC Standby Pins (26, 50, 92, 114)', voltage: '3.3V DC', desc: 'EC IC ပုံမှန်အလုပ်လုပ်ရန် လိုအပ်သော Standby Power' },
+                    { pin: 'Pin 125 (NBSWON# / PWR_SW)', voltage: '3.3V -> 0V Pulse', desc: 'Power Button နှိပ်လိုက်ပါက 3.3V မှ 0V သို့ ခဏကျသွားရမည်' },
+                    { pin: 'Pin 112 (RSMRST#)', voltage: '3.3V DC (High)', desc: 'Reset Resume Signal to PCH / SOC' },
+                    { pin: 'Pin 106 (PCH_PWRON# / PM_SLP_S3#)', voltage: '3.3V DC', desc: 'Power On Sleep State Signal from PCH' }
+                ]
+            },
+            bios: {
+                name: 'SOP8 / WSON8 SPI Flash BIOS IC (25Q64 / 25Q128)',
+                package: '8-Pin SOP8 (Pin 1 Dot top-left corner)',
+                pinoutSvg: `
+                    <svg viewBox="0 0 300 200" class="w-full h-auto bg-slate-950 rounded-xl border border-slate-800 p-2">
+                        <rect x="100" y="40" width="100" height="120" fill="#0f172a" stroke="#eab308" stroke-width="2" rx="4"/>
+                        <circle cx="115" cy="55" r="5" fill="#ef4444"/> <!-- Pin 1 Dot -->
+                        <text x="125" y="105" fill="#fde047" font-size="14" font-weight="bold">BIOS</text>
+
+                        <g fill="#cbd5e1" font-size="8">
+                            <rect x="80" y="50" width="20" height="10"/><text x="25" y="58" fill="#eab308">1: CS#</text>
+                            <rect x="80" y="80" width="20" height="10"/><text x="25" y="88" fill="#cbd5e1">2: SO (DO)</text>
+                            <rect x="80" y="110" width="20" height="10"/><text x="25" y="118" fill="#cbd5e1">3: WP#</text>
+                            <rect x="80" y="140" width="20" height="10"/><text x="25" y="148" fill="#ef4444">4: GND</text>
+
+                            <rect x="200" y="50" width="20" height="10"/><text x="225" y="58" fill="#a7f3d0">8: VCC (3.3V)</text>
+                            <rect x="200" y="80" width="20" height="10"/><text x="225" y="88" fill="#cbd5e1">7: HOLD#</text>
+                            <rect x="200" y="110" width="20" height="10"/><text x="225" y="118" fill="#cbd5e1">6: CLK</text>
+                            <rect x="200" y="140" width="20" height="10"/><text x="225" y="148" fill="#cbd5e1">5: SI (DI)</text>
+                        </g>
+                    </svg>
+                `,
+                keyPins: [
+                    { pin: 'Pin 8 (VCC)', voltage: '3.3V DC', desc: 'Main Power Supply for BIOS IC (Standby တွင်ရှိရမည်)' },
+                    { pin: 'Pin 1 (CS# - Chip Select)', voltage: '3.3V Active Low Pulse', desc: 'EC/PCH မှ BIOS ဖြင့် ဆက်သွယ်သည့် Signal' },
+                    { pin: 'Pin 6 (CLK - Clock)', voltage: '1.5V - 1.8V Oscillating', desc: 'SPI Bus Clock Signal' },
+                    { pin: 'Pin 4 (GND)', voltage: '0V (Ground)', desc: 'Ground Connection Pin' }
+                ]
+            }
+        };
+
+        // Navigation Tab Switching Logic
+        function switchTab(tabName) {
+            const tabs = ['inspector', 'pinouts', 'bplus', 'symptoms'];
+            tabs.forEach(t => {
+                document.getElementById(`section-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('active');
+                document.getElementById(`tab-${t}`).classList.add('text-slate-400');
+            });
+
+            document.getElementById(`section-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.remove('text-slate-400');
+        }
+
+        // Hotspot Selection in Board Visualizer
+        function selectHotspot(key) {
+            state.activeHotspot = key;
+            const data = hotspotData[key];
+            if (!data) return;
+
+            document.getElementById('active-component-label').innerText = `Selected: ${data.title}`;
+            document.getElementById('inspector-title').innerText = data.title;
+            document.getElementById('inspector-desc').innerText = data.desc;
+            document.getElementById('probe-point').innerText = data.probe;
+            document.getElementById('normal-val').innerText = data.normalVal;
+            document.getElementById('fault-val').innerText = data.faultVal;
+            document.getElementById('action-rule').innerText = data.action;
+
+            updateMeterDisplay();
+        }
+
+        // Set Multimeter Mode
+        function setMeterMode(mode) {
+            state.meterMode = mode;
+            ['diode', 'dc', 'inject'].forEach(m => {
+                const btn = document.getElementById(`mode-${m}`);
+                if (m === mode) {
+                    btn.className = "px-3 py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold shadow flex items-center justify-center gap-1";
+                } else {
+                    btn.className = "px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold flex items-center justify-center gap-1";
+                }
+            });
+
+            updateMeterDisplay();
+        }
+
+        // Update Multimeter Screen Values based on Hotspot and Mode
+        function updateMeterDisplay() {
+            const data = hotspotData[state.activeHotspot];
+            const meterText = document.getElementById('meter-mode-text');
+            const displayVal = document.getElementById('meter-display-val');
+            const shortWarning = document.getElementById('short-warning');
+
+            if (state.meterMode === 'diode') {
+                meterText.innerText = "DIODE / CONTINUITY TEST MODE";
+                displayVal.innerText = data.meterDiode;
+                if (data.meterDiode.includes('0.000')) {
+                    shortWarning.classList.remove('hidden');
+                } else {
+                    shortWarning.classList.add('hidden');
+                }
+            } else if (state.meterMode === 'dc') {
+                meterText.innerText = "DC VOLTAGE MEASUREMENT MODE";
+                displayVal.innerText = data.meterDC;
+                shortWarning.classList.add('hidden');
+            } else if (state.meterMode === 'inject') {
+                meterText.innerText = "DC BENCH VOLTAGE INJECTION (1.2V)";
+                displayVal.innerText = data.meterInject;
+                if (data.meterInject.includes('3.85A')) {
+                    shortWarning.classList.remove('hidden');
+                    shortWarning.innerText = "🔥 COMPONENT HEATING UP RAPIDLY!";
+                } else {
+                    shortWarning.classList.add('hidden');
+                }
+            }
+        }
+
+        // Toggle Thermal Alcohol Evaporation View
+        function toggleThermalMode() {
+            state.thermalView = !state.thermalView;
+            const btn = document.getElementById('thermal-btn');
+            const evapCircle = document.getElementById('thermal-evap');
+
+            if (state.thermalView) {
+                btn.className = "px-3 py-1 bg-red-600 text-white font-bold rounded-lg text-xs transition animate-pulse";
+                evapCircle.classList.remove('hidden');
+                selectHotspot('caps');
+                setMeterMode('inject');
+            } else {
+                btn.className = "px-3 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 rounded-lg text-xs transition";
+                evapCircle.classList.add('hidden');
+                setMeterMode('diode');
+            }
+        }
+
+        // Reset Simulator
+        function resetSimulator() {
+            state.thermalView = false;
+            document.getElementById('thermal-evap').classList.add('hidden');
+            document.getElementById('thermal-btn').className = "px-3 py-1 bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/30 rounded-lg text-xs transition";
+            selectHotspot('caps');
+            setMeterMode('diode');
+        }
+
+        // Render IC Details dynamically inside TAB 2
+        function showIC(key) {
+            state.selectedIC = key;
+            const ic = icData[key];
+            const container = document.getElementById('ic-display-content');
+
+            ['charger', 'standby', 'ec', 'bios'].forEach(k => {
+                const btn = document.getElementById(`btn-ic-${k}`);
+                if (k === key) {
+                    btn.className = "px-3 py-1.5 bg-blue-600 text-white font-bold rounded-md";
+                } else {
+                    btn.className = "px-3 py-1.5 bg-slate-700 hover:bg-slate-600 text-slate-300 rounded-md";
+                }
+            });
+
+            container.innerHTML = `
+                <!-- Left: SVG Diagram -->
+                <div class="space-y-3">
+                    <h3 class="text-sm font-bold text-blue-400">${ic.name}</h3>
+                    <p class="text-xs text-slate-400">Package: <span class="text-slate-200 font-semibold">${ic.package}</span></p>
+                    ${ic.pinoutSvg}
+                </div>
+
+                <!-- Right: Key Pins Table -->
+                <div class="space-y-3">
+                    <h4 class="text-xs font-bold text-slate-300 uppercase tracking-wider">Critical Pin Testing Specifications:</h4>
+                    <div class="space-y-2">
+                        ${ic.keyPins.map(p => `
+                            <div class="bg-slate-950 border border-slate-800 rounded-lg p-2.5 text-xs">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-bold text-amber-400">${p.pin}</span>
+                                    <span class="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 font-mono rounded font-semibold">${p.voltage}</span>
+                                </div>
+                                <p class="text-slate-400 mt-1 text-[11px] leading-relaxed">${p.desc}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize App on DOM Load
+        window.onload = function() {
+            selectHotspot('caps');
+            showIC('charger');
+        };
+    </script>
 </body>
 </html>
+```
